@@ -57,7 +57,7 @@ jobs:
           fi
           
           echo "Found $COUNT configuration(s) to build"
-          echo "matrix=$FILTERED_CONFIG" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "$FILTERED_CONFIG" | jq -c .)" >> $GITHUB_OUTPUT
 
   build:
     needs: build-matrix
