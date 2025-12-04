@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # Copy config
 COPY docker_config /docker_config
-COPY resources /tmp/resources
+# COPY resources /tmp/resources
 
 # apt 换源
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.ustc.edu.cn/@g /etc/apt/sources.list && \

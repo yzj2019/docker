@@ -1,19 +1,19 @@
 #!/bin/sh
-# arch=$(dpkg --print-architecture)
-# if [[ $arch == 'amd64' ]]; then
-#     curl -fSL "https://www.nomachine.com/free/linux/64/deb" -o nomachine.deb
-# elif  [[ $arch == 'arm64' ]]; then
-#     curl -fSL "https://www.nomachine.com/free/arm/64/deb" -o nomachine.deb
-# else
-#     echo "unsupported architecture: $arch"
-#     exit -1
-# fi
+arch=$(dpkg --print-architecture)
+if [[ $arch == 'amd64' ]]; then
+    curl -fSL "https://www.nomachine.com/free/linux/64/deb" -o nomachine.deb
+elif  [[ $arch == 'arm64' ]]; then
+    curl -fSL "https://www.nomachine.com/free/arm/64/deb" -o nomachine.deb
+else
+    echo "unsupported architecture: $arch"
+    exit -1
+fi
 
-# dpkg -i nomachine.deb
-# rm nomachine.deb
+dpkg -i nomachine.deb
+rm nomachine.deb
 
 # 网络不好时，使用本地nomachine.deb
-dpkg -i /tmp/resources/nomachine.deb
+# dpkg -i /tmp/resources/nomachine.deb
 
 # config nomachine
 groupmod -g 2000 nx
