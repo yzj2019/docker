@@ -28,7 +28,7 @@
 # 创建标签
 git tag v1.0.0
 # 推送标签到远程仓库
-git push --follow-tags
+git push origin v1.0.0
 ```
 
 ## 手动构建本地镜像
