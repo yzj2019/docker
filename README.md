@@ -4,20 +4,12 @@
 
 - 配置文件 `docker_build_config.json`
   定义要构建的镜像的 CUDA 版本、CUDNN 版本和 Ubuntu 版本
-  ```json
-  {
-  "configurations": [
-    {
-      "name": "cuda11-ubuntu20",  # 名称，没什么用
-      "cuda": "11.6.1",             # CUDA 版本
-      "cudnn": "8",               # CUDNN 版本
-      "ubuntu": "20.04",          # Ubuntu 版本
-      "enabled": true             # 是否启用
-    }
-  ]
-  }
-  ```
   具体版本选择参考 [NVIDIA Docker](https://hub.docker.com/r/nvidia/cuda/tags?page=1)
+  - name: 配置名称，没什么用
+  - cuda: CUDA 版本
+  - cudnn: CUDNN 版本
+  - ubuntu: Ubuntu 版本
+  - enabled: 是否自动构建和推送本配置的镜像
 - 最终得到的镜像 tag 格式类似 `${DOCKERHUB_USERNAME}/cuda:11.6.1_cudnn8_ubuntu20.04`
 
 ## 用户配置
