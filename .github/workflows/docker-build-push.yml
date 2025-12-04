@@ -1,0 +1,128 @@
+name: Build and Push Docker Images on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'  # 仅匹配以 v 开头的标签，此时触发
+
+  workflow_dispatch:
+    inputs:
+      config-selector:
+        description: 'Build specific config (name or "all")'
+        required: false
+        default: 'all'
+      skip-push:
+        description: 'Skip pushing to Docker Hub'
+        type: boolean
+        default: false
+
+jobs:
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read build configurations
+        id: set-matrix
+        run: |
+          CONFIG_FILE=".github/docker-build-config.json"
+          
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "Error: Configuration file $CONFIG_FILE not found!"
+            exit 1
+          fi
+
+          # 读取配置文件
+          CONFIG_JSON=$(cat $CONFIG_FILE)
+          
+          # 如果是手动触发且指定了配置，只构建指定的配置
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.config-selector }}" != "all" ]; then
+            SELECTOR="${{ github.event.inputs.config-selector }}"
+            FILTERED_CONFIG=$(echo "$CONFIG_JSON" | jq --arg selector "$SELECTOR" '
+              .configurations | map(select(.name == $selector and .enabled == true))
+            ')
+          else
+            # 否则构建所有启用的配置
+            FILTERED_CONFIG=$(echo "$CONFIG_JSON" | jq '.configurations | map(select(.enabled == true))')
+          fi
+          
+          # 检查是否有配置
+          COUNT=$(echo "$FILTERED_CONFIG" | jq 'length')
+          if [ "$COUNT" -eq 0 ]; then
+            echo "No enabled configurations found!"
+            exit 1
+          fi
+          
+          echo "Found $COUNT configuration(s) to build"
+          echo "matrix=$FILTERED_CONFIG" >> $GITHUB_OUTPUT
+
+  build:
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: ${{ !github.event.inputs.skip-push }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Prepare build parameters
+        id: prepare
+        run: |
+          # 提取配置参数
+          CUDA_VERSION="${{ matrix.config.cuda }}"
+          CUDNN_VERSION="${{ matrix.config.cudnn }}"
+          UBUNTU_VERSION="${{ matrix.config.ubuntu }}"
+          CONFIG_NAME="${{ matrix.config.name }}"
+          
+          # 构建镜像标签
+          IMAGE_TAG="${{ secrets.DOCKERHUB_USERNAME }}/cuda:${CUDA_VERSION}_cudnn${CUDNN_VERSION}_ubuntu${UBUNTU_VERSION}"
+          
+          echo "cuda=$CUDA_VERSION" >> $GITHUB_OUTPUT
+          echo "cudnn=$CUDNN_VERSION" >> $GITHUB_OUTPUT
+          echo "ubuntu=$UBUNTU_VERSION" >> $GITHUB_OUTPUT
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "config_name=$CONFIG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ !github.event.inputs.skip-push }}
+          tags: ${{ steps.prepare.outputs.image_tag }}
+          build-args: |
+            CUDA=${{ steps.prepare.outputs.cuda }}
+            CUDNN=${{ steps.prepare.outputs.cudnn }}
+            UBUNTU=${{ steps.prepare.outputs.ubuntu }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            cuda.version=${{ steps.prepare.outputs.cuda }}
+            cudnn.version=${{ steps.prepare.outputs.cudnn }}
+            ubuntu.version=${{ steps.prepare.outputs.ubuntu }}
+
+      - name: Display build info
+        env:
+          CUDA: ${{ steps.prepare.outputs.cuda }}
+          CUDNN: ${{ steps.prepare.outputs.cudnn }}
+          UBUNTU: ${{ steps.prepare.outputs.ubuntu }}
+          CONFIG_NAME: ${{ steps.prepare.outputs.config_name }}
+          IMAGE_TAG: ${{ steps.prepare.outputs.image_tag }}
+        run: |
+          echo "✅ Build completed for configuration: $CONFIG_NAME"
+          echo "📦 Image: $IMAGE_TAG"
+          echo "🔧 From docker.io/nvidia/cuda:${CUDA}-cudnn${CUDNN}-devel-ubuntu${UBUNTU}"

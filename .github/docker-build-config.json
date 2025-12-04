@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "name": "cu116-ubuntu20",
+      "cuda": "11.6.1",
+      "cudnn": "8",
+      "ubuntu": "20.04",
+      "enabled": true
+    },
+    {
+      "name": "cu121-ubuntu20",
+      "cuda": "12.1.0",
+      "cudnn": "8",
+      "ubuntu": "20.04",
+      "enabled": true
+    },
+    {
+      "name": "cu130-ubuntu22",
+      "cuda": "13.0.2",
+      "cudnn": "",
+      "ubuntu": "22.04",
+      "enabled": false
+    }
+  ]
+}

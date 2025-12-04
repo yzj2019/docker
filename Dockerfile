@@ -24,9 +24,6 @@ COPY resources /tmp/resources
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.ustc.edu.cn/@g /etc/apt/sources.list && \
     apt-get clean && \
     apt-get update
-# DNS服务器
-# RUN echo "nameserver 8.8.8.8" >> /etc/resolv.conf
-# RUN echo "nameserver 8.8.4.4" >> /etc/resolv.conf
 
 # Install and Configure OpenGL
 RUN apt-get update && \

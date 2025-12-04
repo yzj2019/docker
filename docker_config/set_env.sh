@@ -10,9 +10,13 @@ echo "root:$PASSWORD" | chpasswd
 # 添加 .bashrc 到末尾
 echo "source /docker_config/.bashrc" >> /root/.bashrc
 
+# DNS服务器
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+
 # Install zerotier with input net id
 ZerotierNetID=$1
 bash /docker_config/install_zerotier.sh $ZerotierNetID
 
-# 设置用户自定义环境启动
+# [UserDef] 设置用户自定义环境启动
 # ...

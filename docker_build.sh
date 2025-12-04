@@ -7,7 +7,8 @@ CUDA=$2
 CUDNN=$3
 UBUNTU=$4
 
-IMAGE_TAG="${USER_NAME}/cuda:${CUDA}_cudnn${CUDNN}_ubuntu${UBUNTU}"     # 改成你的dockerhub名称
+# [UserDef] 用户自定义 dockerhub 仓库名称
+IMAGE_TAG="${USER_NAME}/cuda:cuda${CUDA}_cudnn${CUDNN}_ubuntu${UBUNTU}"
 echo "构建的镜像: ${IMAGE_TAG}"
 echo "base镜像: nvidia/cuda:${CUDA}-cudnn${CUDNN}-devel-ubuntu${UBUNTU}"
 
