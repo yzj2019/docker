@@ -44,7 +44,7 @@ sh docker_run.sh
 ```
 
 ## TODO
-- [ ] 添加连接用的 ssh key 到 github action secrets
+- [ ] 添加连接用的 ssh key 到 github action secrets, 取消dockerfile 中的注释
 - [ ] 验证 docker 桌面、nomachine 连接是否配置成功
 - [ ] 考虑是否要删除 zerotier
 - [ ] 考虑添加显卡驱动，详见 GeForce-XorgDisplaySettingAuto.sh

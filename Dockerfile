@@ -93,15 +93,15 @@ RUN bash /docker_config/install_miniconda.sh
 RUN git config --global user.email "1223358821@qq.com" &&\
     git config --global user.name "Zijian Yu" &&\
     # configuration ssh enviroment for github
-    mkdir -p /root/.ssh &&\
-    cp /docker_config/.ssh/id_rsa /root/.ssh &&\
-    cp /docker_config/.ssh/config /root/.ssh &&\
-    chmod -R 600 /root/.ssh &&\
-    echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config &&\
-    echo "UserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config &&\
-    # configuration ssh enviroment for login
-    cp /docker_config/.ssh/id_rsa_docker.pub /root/.ssh &&\
-    cat /root/.ssh/id_rsa_docker.pub >> /root/.ssh/authorized_keys &&\
+    # mkdir -p /root/.ssh &&\
+    # cp /docker_config/.ssh/id_rsa /root/.ssh &&\
+    # cp /docker_config/.ssh/config /root/.ssh &&\
+    # chmod -R 600 /root/.ssh &&\
+    # echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config &&\
+    # echo "UserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config &&\
+    # # configuration ssh enviroment for login
+    # cp /docker_config/.ssh/id_rsa_docker.pub /root/.ssh &&\
+    # cat /root/.ssh/id_rsa_docker.pub >> /root/.ssh/authorized_keys &&\
     mkdir /var/run/sshd &&  \
     sed -i 's/#*PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config && \
     sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
